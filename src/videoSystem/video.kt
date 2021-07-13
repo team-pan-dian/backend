@@ -50,7 +50,8 @@ fun Route.video() {
                     viewCount = video[Video.viewCount],
                     information = video[Video.information],
                     sequence = video[Video.sequence],
-                    classId = video[Video.classId]
+                    classId = video[Video.classId],
+                    img = video[Video.img]
                 )
             }
             call.respond(

@@ -1,8 +1,12 @@
 # API Docs
 
 ## login system
+- 預設老師帳號
+    - name: `teacher`
+    - password: `password`
+    
 
-- 登入 [POST] `/api/login`
+- 登入 **[POST]** `/api/login`
     - `curl -X POST -F name={User Name} -F password={User Password} http://{Host Name}/api/login`
     - ```json
         {
@@ -14,7 +18,9 @@
     - error
       - UnprocessableEntity: 遺失參數
       - Forbidden: 資訊錯誤
-- 註冊 [POST] `/api/sign-up`
+    
+
+- 註冊 **[POST]** `/api/sign-up`
     - `curl -X POST -F name={User Name} -F password={User Password} http://{Host Name}/api/sign-up`
     - ```json
       {
@@ -29,7 +35,7 @@
     
 ## video system
 
-- 課程資訊 [GET] `/api/class/{Class Id}`
+- 課程資訊 **[GET]** `/api/class/{Class Id}`
     - `curl -X GET http://{Host Name}/api/class/{Class Id}`
     - ```json5
         {
@@ -45,7 +51,8 @@
         }
       ```
       
-- 新增課程 [POST] `/api/class`
+      
+- 新增課程 **[POST]** `/api/class`
     - `curl -X POST -F name={Class Name} -F info={Class Information} http://{Host Name}/api/class`
     - ```json
       {
@@ -57,3 +64,17 @@
     - error
         - UnprocessableEntity: 缺少參數
     
+
+    
+- 刪除課程 **[DELETE]** `/api/class/{Class Id}`
+
+- 修改課程 **[PUT]** `/api/class/{Class Id}`
+
+- 上傳影片到課程 **[POST]** `/api/class/{Class Id}/`
+
+- 課程影片資訊 **[GET]** `/api/class/{Class Id}/{Video Id}`
+
+- 更新課程影片資訊 **[PUT]** `/api/class/{Class Id}/{Video Id}`
+
+- 修改課程排序 **[PUT]** `/api/class/{Class Id}/{Video Id}/order`
+
