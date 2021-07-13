@@ -5,11 +5,12 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun validate(userId: Int): Boolean {
+    var isUser: Boolean? = null
     transaction {
         val userData = Student.select {
             Student.id.eq(userId)
-        }.first()
-        val isUser = userData[Student.id]
+        }.singleOrNull()
+        isUser = userData != null
     }
-    return true
+    return isUser ?: false
 }

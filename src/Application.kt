@@ -1,8 +1,8 @@
 package com.hack
 
-import com.auth0.jwt.JWT
 import com.hack.db.initDB
 import com.hack.loginSystem.JWTConfig
+import com.hack.loginSystem.TokenSession
 import com.hack.loginSystem.login
 import com.hack.videoSystem.video
 import io.ktor.application.*
@@ -16,6 +16,8 @@ import org.slf4j.event.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
 import io.ktor.gson.*
+import io.ktor.util.*
+
 //xigua too dian
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -24,14 +26,26 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 fun Application.module(testing: Boolean = false) {
 
     initDB()
+
     install(Sessions) {
+        val secretEncryptKey = hex("00112233445566778899aabbccddeeff")
+        val secretAuthKey = hex("02030405060708090a0b0c")
+        cookie<TokenSession>("TokenSession", SessionStorageMemory()) {
+            cookie.extensions["SameSite"] = "lax"
+            transform(SessionTransportTransformerEncrypt(secretEncryptKey, secretAuthKey))
+        }
     }
 
     install(Authentication) {
         jwt {
             realm = "ktor.io"
             verifier(JWTConfig.verifier)
-
+            validate {
+                val id = it.payload.getClaim("id").asInt()
+                if (com.hack.loginSystem.validate(id))
+                    JWTPrincipal(it.payload)
+                else null
+            }
         }
     }
 
@@ -51,18 +65,17 @@ fun Application.module(testing: Boolean = false) {
         anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
     }
 
-    install(Authentication) {
-    }
-
     install(ContentNegotiation) {
         gson {
         }
     }
 
     routing {
-        login()
-        authenticate {
-            video()
+        route("/api/") {
+            login()
+            authenticate {
+                video()
+            }
         }
     }
 

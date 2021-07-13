@@ -7,5 +7,6 @@ data class VideoData(
     val collect: Boolean,
     val information: String,
     val viewCount: Int,
-    val order: Int
+    val sequence: Int,
+    val classId: Int
 )
