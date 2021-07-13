@@ -61,9 +61,8 @@ fun Application.module(testing: Boolean = false) {
 
     routing {
         login()
-        video()
         authenticate {
-
+            video()
         }
     }
 

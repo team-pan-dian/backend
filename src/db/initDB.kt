@@ -11,7 +11,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 object Student : Table() {
     val id = integer("StudentId").autoIncrement().primaryKey()
     val name = text("Name")
-    val collect = integer("Collect") 
+    val collect = integer("Collect")
     val collects = text("Collects") // json
 }
 
@@ -26,7 +26,7 @@ object Class : Table() {
 object Video : Table() {
     val id =  integer("VideoId").autoIncrement().primaryKey()
     val name = text("Name")
-    val url = text("URL")
+    val token = text("URL")
     val collect = bool("Collect")
     val information = text("Information")
     val viewCount = integer("ViewCount")

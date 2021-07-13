@@ -18,6 +18,16 @@ fun Route.video() {
         val url: String,
         val information: String,
     )
+    
+    data class    
+   
+    get("/class/{classnum}") {
+        val classID = call.request.queryParameters["classnum"]?.toInt()
+        if (classID == null) call.respond(mapOf("Fail" to true))
+        else {
+            var response: 
+        }
+    }
 
     get("/video/{number}") {
         val videoID = call.request.queryParameters["number"]?.toInt()

@@ -13,11 +13,11 @@ fun searchVideo(videoList: String): List<VideoData> {
         Video.select {
             Video.id inList videoIdList
         }
-    }.map { 
+    }.map {
         VideoData(
             it[Video.id],
             it[Video.name],
-            it[Video.url],
+            it[Video.token],
             it[Video.collect],
             it[Video.information],
             it[Video.viewCount],
