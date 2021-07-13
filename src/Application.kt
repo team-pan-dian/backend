@@ -70,6 +70,27 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 
+    install(StatusPages) {
+        // 404
+        status(HttpStatusCode.NotFound) {
+//            call.respond()
+        }
+
+        // 403 422 400
+        status(
+            HttpStatusCode.Forbidden,
+            HttpStatusCode.ServiceUnavailable,
+            HttpStatusCode.BadRequest
+        ) {
+//            call.respond()
+        }
+
+        // 500
+        status(HttpStatusCode.InternalServerError) {
+//            call.respond()
+        }
+    }
+
     routing {
         route("/api/") {
             login()

@@ -7,15 +7,13 @@ import com.hack.db.Class.primaryKey
 import com.hack.db.Video
 import io.ktor.application.*
 import io.ktor.features.*
+import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 import java.io.File
 
 fun Route.video() {
@@ -33,33 +31,46 @@ fun Route.video() {
         val information: String,
     )
 
-    get("/class/{classnum}") {
-        val classID = call.request.queryParameters["classnum"]?.toInt()
-        if (classID == null) call.respond(API(true, null, "Fail"))
+    get("/class/{id}") {
+        val classID = call.request.queryParameters["id"]?.toInt()
+        if (classID == null) call.respond(
+            HttpStatusCode.UnprocessableEntity,
+            API(true, null, "Fail")
+        )
         else {
             var response: ClassCopy? = null
             transaction {
                 val request = Class.select {
                     Class.id.eq(classID)
-                }.first()
-                val videoList = searchVideo(request[Class.id])
-                response = ClassCopy(
-                    id = request[Class.id].toString(),
-                    name = request[Class.name],
-                    count = request[Class.count],
-                    information = request[Class.information],
-                    videoList = videoList
-                )
+                }.firstOrNull()
+                response = if (request != null) {
+                    val count = Video.select {
+                        Video.id.eq(request[Video.id])
+                    }.toList().size
+                    val videoList = searchVideo(request[Class.id])
+                    ClassCopy(
+                        id = request[Class.id].toString(),
+                        name = request[Class.name],
+                        count = count,
+                        information = request[Class.information],
+                        videoList = videoList
+                    )
+                } else null
             }
 
             call.respond(
+                HttpStatusCode.BadRequest,
                 API(
                     data = response,
                     error = response == null,
-                    errorMessage = if (response == null) "" else ""
+                    errorMessage = if (response == null) "Fail" else ""
                 )
             )
         }
+    }
+
+    post("/class") {
+
     }
 
     put("/class/{classnum}") {
@@ -68,7 +79,7 @@ fun Route.video() {
         transaction {
 
         }
-  }
+    }
 
     delete("class/{classnum}") {
         val requestId = call.parameters["classnum"]?.toInt() ?: throw BadRequestException("The type of Id is wrong.")

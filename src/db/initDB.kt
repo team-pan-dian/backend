@@ -12,7 +12,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 object Student : Table() {
     val id = integer("StudentId").autoIncrement().primaryKey()
     val name = text("Name")
-    val password = text("password")
+    val hashcode = text("Hashcode")
     val collect = integer("Collect")
     val collects = text("Collects") // json
     val teacher = bool("teacher")
@@ -21,7 +21,6 @@ object Student : Table() {
 object Class : Table() {
     val id = integer("ClassId").autoIncrement().primaryKey()
     val name = text("Name")
-    val count = integer("Count")
     val information = text("Information")
 }
 
@@ -46,9 +45,10 @@ fun initDB() {
         SchemaUtils.create(Student, Class, Video)
         Student.insert {
             it[name] = "22"
-            it[Student.password] = "aa"
-            it[Student.collect] = 10
-            it[Student.collects] = ""
+            it[hashcode] = "aa"
+            it[collect] = 10
+            it[collects] = ""
+            it[teacher] = false
         }
     }
 }
