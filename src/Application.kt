@@ -1,9 +1,11 @@
 package com.hack
 
+import com.hack.api.API
 import com.hack.db.initDB
 import com.hack.loginSystem.JWTConfig
 import com.hack.loginSystem.TokenSession
 import com.hack.loginSystem.login
+import com.hack.videoSystem.classSystem
 import com.hack.videoSystem.video
 import io.ktor.application.*
 import io.ktor.response.*
@@ -72,22 +74,45 @@ fun Application.module(testing: Boolean = false) {
 
     install(StatusPages) {
         // 404
-        status(HttpStatusCode.NotFound) {
-//            call.respond()
+        statusFile(HttpStatusCode.NotFound, HttpStatusCode.Unauthorized, filePattern = "404.html")
+
+        exception<MissingRequestParameterException> {
+
+            call.respond(
+                HttpStatusCode.UnprocessableEntity,
+                API(
+                    true,
+                    null,
+                    it.message
+                )
+            )
         }
 
-        // 403 422 400
+        exception<BadRequestException> {
+            call.respond(
+                HttpStatusCode.BadRequest,
+                API(
+                    true,
+                    null,
+                    it.message
+                )
+            )
+        }
+        // 403 422 400 500
         status(
             HttpStatusCode.Forbidden,
             HttpStatusCode.ServiceUnavailable,
-            HttpStatusCode.BadRequest
+            HttpStatusCode.BadRequest,
+            HttpStatusCode.UnprocessableEntity,
+            HttpStatusCode.InternalServerError
         ) {
-//            call.respond()
-        }
-
-        // 500
-        status(HttpStatusCode.InternalServerError) {
-//            call.respond()
+            call.respond(
+                API(
+                    true,
+                    null,
+                    "GG"
+                )
+            )
         }
     }
 
@@ -96,6 +121,7 @@ fun Application.module(testing: Boolean = false) {
             login()
             authenticate {
                 video()
+                classSystem()
             }
         }
     }

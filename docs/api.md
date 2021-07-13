@@ -30,13 +30,19 @@
 ## video system
 
 - 課程資訊 [GET] `/api/class/{Class Id}`
-    - `curl -X GET http://{Host Name}/api/class/1`
-    - ```json
-      {
-          "error": false,
-          "data": "ok",
-          "errorMessage": ""
-      }
+    - `curl -X GET http://{Host Name}/api/class/{Class Id}`
+    - ```json5
+        {
+            "error": false,
+            "data": {
+                "id": "1", // 課程id
+                "name": "a", // 課程名稱
+                "count": 0, // 課程數量
+                "information": "w", //課程說明
+                "videoList": [] // 課程影片id清單
+            },
+            "errorMessage": ""
+        }
       ```
       
 - 新增課程 [POST] `/api/class`

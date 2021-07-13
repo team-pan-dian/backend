@@ -2,7 +2,6 @@ package com.hack.db
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.ktor.auth.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
@@ -27,7 +26,8 @@ object Class : Table() {
 object Video : Table() {
     val id =  integer("VideoId").autoIncrement().primaryKey()
     val name = text("Name")
-    val token = text("URL")
+    val url = text("URL")
+    val img = text("img")
     val classId = integer("ClassId")
     val collect = bool("Collect")
     val information = text("Information")

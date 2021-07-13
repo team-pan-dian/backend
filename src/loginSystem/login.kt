@@ -4,14 +4,12 @@ import at.favre.lib.crypto.bcrypt.BCrypt
 import com.hack.api.API
 import com.hack.db.Student
 import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.http.HttpStatusCode.Companion.Unauthorized
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -25,11 +23,12 @@ fun Route.login() {
 
         if (userName != null && userPassword != null) {
             var loginData: ResultRow? = null
-            println("$userName $userPassword")
+
             transaction {
                 loginData = Student.select {
                     Student.name.eq(userName)
                 }.firstOrNull()
+
                 if (loginData != null)
                     loginData = if (
                         BCrypt.verifyer()
@@ -56,14 +55,7 @@ fun Route.login() {
                 )
             )
 
-        } else call.respond(
-            HttpStatusCode.UnprocessableEntity,
-            API(
-                true,
-                null,
-                "missing parameter"
-            )
-        )
+        } else throw MissingRequestParameterException("name or password")
 
     }
 
@@ -71,12 +63,15 @@ fun Route.login() {
         val userInformation = call.receiveParameters()
         val userName = userInformation["name"]
         val userPassword = userInformation["password"]
+
         if (userName != null && userPassword != null) {
             var isUser: ResultRow? = null
+
             transaction {
                 isUser = Student.select {
                     Student.name.eq(userName)
                 }.firstOrNull()
+
                 if (isUser == null)
                     Student.insert {
                         it[name] = userName
@@ -86,6 +81,7 @@ fun Route.login() {
                         it[teacher] = false
                     }
             }
+
             if (isUser == null) {
                 call.respond(
                     API(
@@ -93,22 +89,8 @@ fun Route.login() {
                         "Ok"
                     )
                 )
-            } else call.respond(
-                HttpStatusCode.BadRequest,
-                API(
-                    true,
-                    null,
-                    "used"
-                )
-            )
+            } else throw BadRequestException("Used")
 
-        } else call.respond(
-            HttpStatusCode.UnprocessableEntity,
-            API(
-                true,
-                null,
-                "missing parameter"
-            )
-        )
+        } else throw MissingRequestParameterException("name or password")
     }
 }
