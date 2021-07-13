@@ -7,7 +7,6 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun searchVideo(classId: Int): List<VideoData> {
-
     return transaction {
         Video.select {
             Video.classId.eq(classId)

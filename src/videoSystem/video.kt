@@ -32,10 +32,10 @@ fun Route.video() {
     )
 
     get("/class/{id}") {
-        val classID = call.request.queryParameters["id"]?.toInt()
+        val classID = call.parameters["id"]?.toInt()
         if (classID == null) call.respond(
             HttpStatusCode.UnprocessableEntity,
-            API(true, null, "Fail")
+            API(true, null, "missing parameter")
         )
         else {
             var response: ClassCopy? = null
@@ -44,33 +44,52 @@ fun Route.video() {
                     Class.id.eq(classID)
                 }.firstOrNull()
                 response = if (request != null) {
-                    val count = Video.select {
-                        Video.id.eq(request[Video.id])
-                    }.toList().size
-                    val videoList = searchVideo(request[Class.id])
+
+                    val videoList = searchVideo(classID)
                     ClassCopy(
                         id = request[Class.id].toString(),
                         name = request[Class.name],
-                        count = count,
+                        count = videoList.size,
                         information = request[Class.information],
                         videoList = videoList
                     )
                 } else null
             }
-
+            println(response)
             call.respond(
-                HttpStatusCode.BadRequest,
                 API(
-                    data = response,
-                    error = response == null,
-                    errorMessage = if (response == null) "Fail" else ""
+                    response == null,
+                    response,
+                    if (response == null) "Fail" else ""
                 )
             )
         }
     }
 
     post("/class") {
+        val receive = call.receiveParameters()
+        val className = receive["name"]
+        val classInformation = receive["info"]
 
+        if (classInformation != null && className != null) {
+            transaction {
+                Class.insert {
+                    it[name] = className
+                    it[information] = classInformation
+                }
+            }
+            call.respond(API(
+                false,
+                "Ok"
+            ))
+        } else call.respond(
+            HttpStatusCode.UnprocessableEntity,
+            API(
+                true,
+                null,
+                "missing parameter"
+            )
+        )
     }
 
     put("/class/{classnum}") {
