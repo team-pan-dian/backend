@@ -179,7 +179,27 @@
 - 加入收藏 **[POST]** `/api/student/start`
     - `curl -X POST /api/student/start?video={Video Id}`
     - ```json5
-        
+      {
+          "error": false,
+          "data": "ok",
+          "errorMessage": ""
+      }
       ```
+  - error
+      - UnprocessableEntity: 缺少參數
+      - BadRequestException: 沒這個video
 
-[comment]: <> (`應該還有學生加入課程和退出ㄅ 還是這邊都是教師`) // have those thing will be unfree
+- 刪除收藏 **[DELETE]** `/api/student/start`
+    - `curl -X DELETE /api/student/start?video={Video Id}`
+    - ```json5
+      {
+          "error": false,
+          "data": "ok",
+          "errorMessage": ""
+      }
+      ```
+    - error
+        - UnprocessableEntity: 缺少參數
+        - BadRequestException: 沒這個video
+
+[comment] <> (`應該還有學生加入課程和退出ㄅ 還是這邊都是教師`) // have this thing will be unfree
