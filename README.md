@@ -3,6 +3,6 @@
 ## Install
 - Install postgresql image`sudo docker pull bitnami/postgresql:latest`
 
-## Open
+## Run
 - `sudo docker-compose up`
 
