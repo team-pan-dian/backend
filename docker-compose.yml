@@ -1,9 +1,5 @@
 version: '3.6'
 
-networks:
-  app-tier:
-    driver: bridge
-
 services:
   postgresql:
     image: 'bitnami/postgresql:latest'
@@ -25,7 +21,6 @@ services:
       - postgresql
     restart: always
     network_mode: "host"
-
 
 volumes:
   postgres-data:
