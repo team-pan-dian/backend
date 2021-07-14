@@ -3,6 +3,7 @@ package com.hack.videoSystem
 import com.hack.api.API
 import com.hack.db.ClassesTable
 import io.ktor.application.*
+import io.ktor.auth.*
 import io.ktor.features.*
 import io.ktor.request.*
 import io.ktor.response.*
@@ -35,6 +36,7 @@ fun Route.classSystem() {
                 )
             }
         }
+        println(data)
         if (data != null) call.respond(
             API(
                 false,
@@ -76,82 +78,86 @@ fun Route.classSystem() {
         }
     }
     // ok
-    post("/class") {
-        val receive = call.receiveParameters()
-        val className = receive["name"]
-        val classInformation = receive["info"]
-        val classType = receive["type"]
+    authenticate {
+        post("/class") {
+            val receive = call.receiveParameters()
+            val className = receive["name"]
+            val classInformation = receive["info"]
+            val classType = receive["type"]
 
-        if (classInformation != null && className != null && classType != null) {
-            transaction {
-                ClassesTable.insert {
-                    it[name] = className
-                    it[information] = classInformation
-                    it[img] = ""
-                    it[type] = classType
-                }
-            }
-            call.respond(
-                API(
-                    false,
-                    "Ok"
-                )
-            )
-        } else throw MissingRequestParameterException("name or info or type")
-    }
-
-    delete("/class/{id}") {
-        val classID = call.parameters["id"]?.toInt() ?: throw BadRequestException("The type of Id is wrong.")
-        var classData: ResultRow? = null
-        transaction {
-            classData = ClassesTable.select {
-                ClassesTable.id.eq(classID)
-            }.firstOrNull()
-            ClassesTable.deleteWhere { ClassesTable.id.eq(classID) }
-        }
-
-        if (classData == null) throw BadRequestException("")
-        else call.respond(
-            API(
-                false,
-                "Ok"
-            )
-        )
-    }
-
-    put("/class/{id}") {
-        val classId = call.parameters["id"]?.toInt()
-        val query = call.request.queryParameters
-        val className = query["name"]
-        val info = query["info"]
-
-        if (classId != null && (className != null || info != null)) {
-            var isClass = false
-            transaction {
-                isClass = ClassesTable.select {
-                    ClassesTable.id.eq(classId)
-                }.firstOrNull() != null
-                ClassesTable.update({ ClassesTable.id.eq(classId) }) {
-                    if (className != null)
+            if (classInformation != null && className != null && classType != null) {
+                transaction {
+                    ClassesTable.insert {
                         it[name] = className
-                    if (info != null) {
-                        it[information] = info
+                        it[information] = classInformation
+                        it[img] = ""
+                        it[type] = classType
                     }
                 }
-            }
-
-            if (isClass) {
                 call.respond(
                     API(
                         false,
                         "Ok"
                     )
                 )
-            } else throw BadRequestException("")
+            } else throw MissingRequestParameterException("name or info or type")
+        }
 
-        } else throw MissingRequestParameterException("name or info")
+        delete("/class/{id}") {
+            val classID = call.parameters["id"]?.toInt() ?: throw BadRequestException("The type of Id is wrong.")
+            var classData: ResultRow? = null
+            transaction {
+                classData = ClassesTable.select {
+                    ClassesTable.id.eq(classID)
+                }.firstOrNull()
+                ClassesTable.deleteWhere { ClassesTable.id.eq(classID) }
+            }
+
+            if (classData == null) throw BadRequestException("")
+            else call.respond(
+                API(
+                    false,
+                    "Ok"
+                )
+            )
+        }
+
+        put("/class/{id}") {
+            val classId = call.parameters["id"]?.toInt()
+            val query = call.request.queryParameters
+            val className = query["name"]
+            val info = query["info"]
+
+            if (classId != null && (className != null || info != null)) {
+                var isClass = false
+                transaction {
+                    isClass = ClassesTable.select {
+                        ClassesTable.id.eq(classId)
+                    }.firstOrNull() != null
+                    ClassesTable.update({ ClassesTable.id.eq(classId) }) {
+                        if (className != null)
+                            it[name] = className
+                        if (info != null) {
+                            it[information] = info
+                        }
+                    }
+                }
+
+                if (isClass) {
+                    call.respond(
+                        API(
+                            false,
+                            "Ok"
+                        )
+                    )
+                } else throw BadRequestException("")
+
+            } else throw MissingRequestParameterException("name or info")
+        }
     }
+
     put("class/{ClassID}/{VideoID}/order") {
 
     }
+
 }

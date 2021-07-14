@@ -43,7 +43,7 @@
 ## video system
 
 - 所有課程 **[GET]** `/api/classes`
-    - `curl -X GET -H "Authorization: Bearer {JWT}" http://{Host Name}/api/classes`
+    - `curl -X GET http://{Host Name}/api/classes`
     - ```json5
         {
           "error":false,
@@ -62,7 +62,7 @@
 
 
 - 課程資訊 **[GET]** `/api/class/{Class Id}`
-    - `curl -X GET -H "Authorization: Bearer {JWT}" http://{Host Name}/api/class/{Class Id}`
+    - `curl -X GET http://{Host Name}/api/class/{Class Id}`
     - ```json5
         {
             "error": false,
@@ -145,7 +145,7 @@
         - BadRequestException: 沒這個class
 
 - 影片資訊 **[GET]** `/api/class/{Class Id}/{Video Id}`
-    - `curl -X GET -H "Authorization: Bearer {JWT}" http://{Host Nmae}/api/class/{Class Id}/{Video id}`
+    - `curl -X GET http://{Host Nmae}/api/class/{Class Id}/{Video id}`
     - ```json5
       {
           "error": false,

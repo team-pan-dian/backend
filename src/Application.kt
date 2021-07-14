@@ -64,8 +64,10 @@ fun Application.module(testing: Boolean = false) {
 
     install(StatusPages) {
         // 404
-        statusFile(HttpStatusCode.NotFound, HttpStatusCode.Unauthorized, filePattern = "404.html")
-
+//        statusFile(HttpStatusCode.NotFound, HttpStatusCode.Unauthorized, filePattern = "404.html")
+        status(HttpStatusCode.NotFound) {
+            call.respond("a")
+        }
         exception<MissingRequestParameterException> {
 
             call.respond(
@@ -106,21 +108,15 @@ fun Application.module(testing: Boolean = false) {
             )
         }
     }
-
-    routing {
-        route("/api/") {
-            login()
-            authenticate {
-                video()
-                classSystem()
-                student()
-            }
-        }
-    }
-
-    routing {
+    install(Routing) {
         get("/") {
             call.respondText("HELLO WORLD!")
+        }
+        route("/api/") {
+            login()
+            video()
+            classSystem()
+            student()
         }
     }
 }

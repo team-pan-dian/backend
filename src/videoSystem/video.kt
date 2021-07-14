@@ -3,6 +3,7 @@ package com.hack.videoSystem
 import com.hack.api.API
 import com.hack.db.VideoTable
 import io.ktor.application.*
+import io.ktor.auth.*
 import io.ktor.features.*
 import io.ktor.http.content.*
 import io.ktor.request.*
@@ -17,12 +18,6 @@ import java.util.*
 
 
 fun Route.video() {
-
-    data class VideoUpload(
-        val ID: String,
-        val information: String,
-    )
-
     // ok
     get("/class/{classId}/{id}") {
         val videoID = call.parameters["id"]?.toInt()
@@ -57,91 +52,95 @@ fun Route.video() {
         }
     }
     // ok
-    put("/class/{classID}/{videoID}") {
-        val videoId = call.parameters["videoID"]?.toInt()
-        val query = call.request.queryParameters
-        val videoName = query["name"]
-        val info = query["info"]
 
-        if (videoId != null && (videoName != null || info != null)) {
-            var isVideo = false
-            transaction {
-                isVideo = VideoTable.select {
-                    VideoTable.id.eq(videoId)
-                }.firstOrNull() != null
-                VideoTable.update({ VideoTable.id.eq(videoId) }) {
-                    if (videoName != null)
-                        it[name] = videoName
-                    if (info != null)
-                        it[information] = info
+    authenticate {
+        put("/class/{classID}/{videoID}") {
+            val videoId = call.parameters["videoID"]?.toInt()
+            val query = call.request.queryParameters
+            val videoName = query["name"]
+            val info = query["info"]
+
+            if (videoId != null && (videoName != null || info != null)) {
+                var isVideo = false
+                transaction {
+                    isVideo = VideoTable.select {
+                        VideoTable.id.eq(videoId)
+                    }.firstOrNull() != null
+                    VideoTable.update({ VideoTable.id.eq(videoId) }) {
+                        if (videoName != null)
+                            it[name] = videoName
+                        if (info != null)
+                            it[information] = info
+                    }
                 }
-            }
-            if (isVideo) {
-                call.respond(
-                    API(
-                        false,
-                        "Ok"
+                if (isVideo) {
+                    call.respond(
+                        API(
+                            false,
+                            "Ok"
+                        )
                     )
-                )
-            } else throw BadRequestException("Fail")
-        } else throw MissingRequestParameterException("name or info")
-    }
-    // ok
-    post("/class/{classID}/upload") {
-        val videoData = call.receiveMultipart()
-        val receive = call.request.queryParameters
-        val videoInfo = receive["info"]
-        val videoName = receive["name"]
-        var fileName: String? = null
-        val classId = call.parameters["classID"]?.toInt()
-        var respondVideoData: VideoData? = null
+                } else throw BadRequestException("Fail")
+            } else throw MissingRequestParameterException("name or info")
+        }
+        // ok
+        post("/class/{classID}/upload") {
+            val videoData = call.receiveMultipart()
+            val receive = call.request.queryParameters
+            val videoInfo = receive["info"]
+            val videoName = receive["name"]
+            var fileName: String? = null
+            val classId = call.parameters["classID"]?.toInt()
+            var respondVideoData: VideoData? = null
 
-        if (classId == null) throw BadRequestException("Fail")
-        if (videoInfo == null || videoName == null) throw MissingRequestParameterException("video Info or name")
-        videoData.forEachPart { part ->
-            when (part) {
-                is PartData.FileItem -> {
-                    fileName = Date().time.toString() + part.originalFileName as String
-                    val fileNameExtension = fileName!!.split(".")
-                    if (fileNameExtension[fileNameExtension.size - 1] != "mp4") {
-                        println(fileNameExtension)
-                        throw BadRequestException("Fail")
-                    } else {
-                        val fileBytes = part.streamProvider().readBytes()
-                        File("H:\\動態桌布\\$fileName").writeBytes(fileBytes)
+            if (classId == null) throw BadRequestException("Fail")
+            if (videoInfo == null || videoName == null) throw MissingRequestParameterException("video Info or name")
+            videoData.forEachPart { part ->
+                when (part) {
+                    is PartData.FileItem -> {
+                        fileName = Date().time.toString() + part.originalFileName as String
+                        val fileNameExtension = fileName!!.split(".")
+                        if (fileNameExtension[fileNameExtension.size - 1] != "mp4") {
+                            println(fileNameExtension)
+                            throw BadRequestException("Fail")
+                        } else {
+                            val fileBytes = part.streamProvider().readBytes()
+                            File("H:\\動態桌布\\$fileName").writeBytes(fileBytes)
+                        }
                     }
                 }
             }
-        }
-        if (fileName == null) throw MissingRequestParameterException("file")
-        else {
+            if (fileName == null) throw MissingRequestParameterException("file")
+            else {
 
-            transaction {
-                val data = VideoTable.insert {
-                    it[name] = videoName
-                    it[information] = videoInfo
-                    it[VideoTable.fileName] = fileName
-                    it[viewCount] = 0
-                    it[VideoTable.classId] = classId
-                }
-                respondVideoData = VideoData(
-                    data[VideoTable.id],
-                    videoName,
-                    videoInfo,
-                    0,
-                    data[VideoTable.sequence],
-                    classId,
-                    fileName!!
-                )
-            }
-            if (respondVideoData != null)
-                call.respond(
-                    API(
-                        false,
-                        respondVideoData
+                transaction {
+                    val data = VideoTable.insert {
+                        it[name] = videoName
+                        it[information] = videoInfo
+                        it[VideoTable.fileName] = fileName
+                        it[viewCount] = 0
+                        it[VideoTable.classId] = classId
+                    }
+                    respondVideoData = VideoData(
+                        data[VideoTable.id],
+                        videoName,
+                        videoInfo,
+                        0,
+                        data[VideoTable.sequence],
+                        classId,
+                        fileName!!
                     )
-                )
-            else throw BadRequestException("Fail")
+                }
+                if (respondVideoData != null)
+                    call.respond(
+                        API(
+                            false,
+                            respondVideoData
+                        )
+                    )
+                else throw BadRequestException("Fail")
+            }
         }
     }
+
 }
