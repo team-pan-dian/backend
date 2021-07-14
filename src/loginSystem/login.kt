@@ -75,7 +75,6 @@ fun Route.login() {
 
     }
 
-
     post("/sign-up") {
         val userInformation = call.receiveParameters()
         val userName = userInformation["name"]
