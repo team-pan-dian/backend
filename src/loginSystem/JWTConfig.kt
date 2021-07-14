@@ -18,12 +18,15 @@ object JWTConfig {
         .withIssuer(issuer)
         .build()
 
-    fun makeToken(user: User): String = JWT.create()
-        .withSubject("Authentication")
-        .withIssuer(issuer)
-        .withClaim("id", user.id)
-        .withExpiresAt(getExpiration())
-        .sign(algorithm)
+    fun makeToken(user: User): String {
+
+        return JWT.create()
+            .withSubject("Authentication")
+            .withIssuer(issuer)
+            .withClaim("id", user.id)
+            .withExpiresAt(getExpiration())
+            .sign(algorithm)
+    }
 
     private fun getExpiration() = Date(System.currentTimeMillis() + validityInMs)
 }

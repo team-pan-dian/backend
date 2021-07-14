@@ -19,7 +19,7 @@
       - UnprocessableEntity: 遺失參數
       - Forbidden: 資訊錯誤
     
-
+    
 - 註冊 **[POST]** `/api/sign-up`
     - `curl -X POST -F name={User Name} -F password={User Password} http://{Host Name}/api/sign-up`
     - ```json
@@ -67,6 +67,17 @@
 
     
 - 刪除課程 **[DELETE]** `/api/class/{Class Id}`
+    - `curl -X DELETE http://{Host Name}/api/class/{Class Id}`
+    - ```json
+      {
+      "error": false,
+      "data": "ok",
+      "errorMessage": ""
+      }
+      ```
+    - error
+        - UnprocessableEntity: 缺少參數
+        - BadRequestException: 沒這個class
 
 - 修改課程 **[PUT]** `/api/class/{Class Id}`
 

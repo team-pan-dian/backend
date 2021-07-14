@@ -8,6 +8,5 @@ data class VideoData(
     val information: String,
     val viewCount: Int,
     val sequence: Int,
-    val classId: Int,
-    val img: String
+    val classId: Int
 )

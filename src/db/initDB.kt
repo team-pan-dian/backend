@@ -21,13 +21,13 @@ object Class : Table() {
     val id = integer("ClassId").autoIncrement().primaryKey()
     val name = text("Name")
     val information = text("Information")
+    val img = text("img")
 }
 
 object Video : Table() {
     val id =  integer("VideoId").autoIncrement().primaryKey()
     val name = text("Name")
     val url = text("URL")
-    val img = text("img")
     val classId = integer("ClassId")
     val collect = bool("Collect")
     val information = text("Information")

@@ -7,6 +7,7 @@ import io.ktor.features.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
@@ -17,7 +18,8 @@ data class ClassCopy(
     val name: String,
     val count: Int,
     val information: String,
-    val videoList: List<VideoData>
+    val videoList: List<VideoData>,
+    val img: String
 )
 
 fun Route.classSystem() {
@@ -39,7 +41,8 @@ fun Route.classSystem() {
                         name = request[Class.name],
                         count = videoList.size,
                         information = request[Class.information],
-                        videoList = videoList
+                        videoList = videoList,
+                        img =  request[Class.img]
                     )
                 } else null
             }
@@ -63,6 +66,7 @@ fun Route.classSystem() {
                 Class.insert {
                     it[name] = className
                     it[information] = classInformation
+                    it[img] = ""
                 }
             }
             call.respond(
@@ -74,10 +78,23 @@ fun Route.classSystem() {
         } else throw MissingRequestParameterException("name or info")
     }
 
+
     delete("class/{id}") {
-        val requestId = call.parameters["id"]?.toInt() ?: throw BadRequestException("The type of Id is wrong.")
+        val classID = call.parameters["id"]?.toInt() ?: throw BadRequestException("The type of Id is wrong.")
+        var classData: ResultRow? = null
         transaction {
-            Class.deleteWhere { Class.id.eq(requestId) }
+            classData = Class.select {
+                Class.id.eq(classID)
+            }.firstOrNull()
+            Class.deleteWhere { Class.id.eq(classID) }
         }
+
+        if (classData == null) throw BadRequestException("")
+        else call.respond(
+            API(
+                false,
+                "Ok"
+            )
+        )
     }
 }

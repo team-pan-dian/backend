@@ -107,6 +107,7 @@ fun Application.module(testing: Boolean = false) {
             HttpStatusCode.InternalServerError
         ) {
             call.respond(
+                it,
                 API(
                     true,
                     null,

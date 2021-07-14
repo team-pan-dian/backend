@@ -20,8 +20,7 @@ fun searchVideo(classId: Int): List<VideoData> {
             it[Video.information],
             it[Video.viewCount],
             it[Video.sequence],
-            it[Video.classId],
-            it[Video.img]
+            it[Video.classId]
         )
     }
 }
