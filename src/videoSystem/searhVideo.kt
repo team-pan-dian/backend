@@ -1,25 +1,25 @@
 package com.hack.videoSystem
 
-import com.hack.db.Video
+import com.hack.db.VideoTable
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun searchVideo(classId: Int): List<VideoData> {
     return transaction {
-        Video.select {
-            Video.classId.eq(classId)
+        VideoTable.select {
+            VideoTable.classId.eq(classId)
         }.sortedBy {
-            it[Video.sequence]
+            it[VideoTable.sequence]
         }
     }.map {
         VideoData(
-            it[Video.id],
-            it[Video.name],
-            it[Video.information],
-            it[Video.viewCount],
-            it[Video.sequence],
-            it[Video.classId],
-            it[Video.fileName]
+            it[VideoTable.id],
+            it[VideoTable.name],
+            it[VideoTable.information],
+            it[VideoTable.viewCount],
+            it[VideoTable.sequence],
+            it[VideoTable.classId],
+            it[VideoTable.fileName]
         )
     }
 }

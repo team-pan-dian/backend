@@ -2,14 +2,13 @@ package com.hack.loginSystem
 
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.hack.api.API
-import com.hack.db.Student
+import com.hack.db.StudentTable
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.sessions.*
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
@@ -26,14 +25,14 @@ fun Route.login() {
             var loginData: ResultRow? = null
 
             transaction {
-                loginData = Student.select {
-                    Student.name.eq(userName)
+                loginData = StudentTable.select {
+                    StudentTable.name.eq(userName)
                 }.firstOrNull()
 
                 if (loginData != null)
                     loginData = if (
                         BCrypt.verifyer()
-                            .verify(userPassword.toCharArray(), loginData?.get(Student.hashcode)).verified
+                            .verify(userPassword.toCharArray(), loginData?.get(StudentTable.hashcode)).verified
                     ) loginData
                     else null
             }
@@ -44,7 +43,7 @@ fun Route.login() {
                     API(
                         false,
                         JWTConfig.makeToken(
-                            User(loginData!![Student.id], loginData!![Student.name])
+                            User(loginData!![StudentTable.id], loginData!![StudentTable.name])
                         )
                     )
                 )
@@ -70,12 +69,12 @@ fun Route.login() {
             var isUser: ResultRow? = null
 
             transaction {
-                isUser = Student.select {
-                    Student.name.eq(userName)
+                isUser = StudentTable.select {
+                    StudentTable.name.eq(userName)
                 }.firstOrNull()
 
                 if (isUser == null)
-                    Student.insert {
+                    StudentTable.insert {
                         it[name] = userName
                         it[hashcode] = BCrypt.withDefaults().hashToString(12, userPassword.toCharArray())
                         it[collect] = 0

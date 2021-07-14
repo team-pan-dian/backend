@@ -1,7 +1,7 @@
 package com.hack.videoSystem
 
 import com.hack.api.API
-import com.hack.db.Class
+import com.hack.db.ClassesTable
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.request.*
@@ -21,17 +21,17 @@ data class ClassCopy(
 )
 
 fun Route.classSystem() {
-
+    // ok
     get("/classes") {
         var data: List<ClassCopy>? = null
         transaction {
-            data = Class.selectAll().map {
+            data = ClassesTable.selectAll().map {
                 ClassCopy(
-                    id = it[Class.id].toString(),
-                    name = it[Class.name],
-                    information = it[Class.information],
-                    img =  it[Class.img],
-                    type = it[Class.type]
+                    id = it[ClassesTable.id].toString(),
+                    name = it[ClassesTable.name],
+                    information = it[ClassesTable.information],
+                    img =  it[ClassesTable.img],
+                    type = it[ClassesTable.type]
                 )
             }
         }
@@ -42,27 +42,27 @@ fun Route.classSystem() {
             )
         ) else throw BadRequestException("Fail")
     }
-
+    // ok
     get("/class/{id}") {
         val classID = call.parameters["id"]?.toInt()
         if (classID == null) throw MissingRequestParameterException("Class Id")
         else {
             var response: ClassCopy? = null
             transaction {
-                val request = Class.select {
-                    Class.id.eq(classID)
+                val request = ClassesTable.select {
+                    ClassesTable.id.eq(classID)
                 }.firstOrNull()
                 response = if (request != null) {
 
                     val videoList = searchVideo(classID)
                     ClassCopy(
-                        id = request[Class.id].toString(),
-                        name = request[Class.name],
+                        id = request[ClassesTable.id].toString(),
+                        name = request[ClassesTable.name],
                         count = videoList.size,
-                        information = request[Class.information],
+                        information = request[ClassesTable.information],
                         videoList = videoList,
-                        img =  request[Class.img],
-                        type = request[Class.type]
+                        img =  request[ClassesTable.img],
+                        type = request[ClassesTable.type]
                     )
                 } else null
             }
@@ -75,7 +75,7 @@ fun Route.classSystem() {
             )
         }
     }
-
+    // ok
     post("/class") {
         val receive = call.receiveParameters()
         val className = receive["name"]
@@ -84,7 +84,7 @@ fun Route.classSystem() {
 
         if (classInformation != null && className != null && classType != null) {
             transaction {
-                Class.insert {
+                ClassesTable.insert {
                     it[name] = className
                     it[information] = classInformation
                     it[img] = ""
@@ -104,10 +104,10 @@ fun Route.classSystem() {
         val classID = call.parameters["id"]?.toInt() ?: throw BadRequestException("The type of Id is wrong.")
         var classData: ResultRow? = null
         transaction {
-            classData = Class.select {
-                Class.id.eq(classID)
+            classData = ClassesTable.select {
+                ClassesTable.id.eq(classID)
             }.firstOrNull()
-            Class.deleteWhere { Class.id.eq(classID) }
+            ClassesTable.deleteWhere { ClassesTable.id.eq(classID) }
         }
 
         if (classData == null) throw BadRequestException("")
@@ -128,10 +128,10 @@ fun Route.classSystem() {
         if (classId != null && (className != null || info != null)) {
             var isClass = false
             transaction {
-                isClass = Class.select {
-                    Class.id.eq(classId)
+                isClass = ClassesTable.select {
+                    ClassesTable.id.eq(classId)
                 }.firstOrNull() != null
-                Class.update({ Class.id.eq(classId) }) {
+                ClassesTable.update({ ClassesTable.id.eq(classId) }) {
                     if (className != null)
                         it[name] = className
                     if (info != null) {

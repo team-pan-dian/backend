@@ -1,7 +1,7 @@
 package com.hack.videoSystem
 
 import com.hack.api.API
-import com.hack.db.Video
+import com.hack.db.VideoTable
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.content.*
@@ -10,7 +10,6 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import java.io.File
@@ -24,39 +23,39 @@ fun Route.video() {
         val information: String,
     )
 
-
+    // ok
     get("/class/{classId}/{id}") {
         val videoID = call.parameters["id"]?.toInt()
         if (videoID == null) throw MissingRequestParameterException("video id")
         else {
             var response: VideoData? = null
             transaction {
-                val video = Video.select {
-                    Video.id.eq(videoID)
+                val video = VideoTable.select {
+                    VideoTable.id.eq(videoID)
                 }.firstOrNull()
 
                 if (video != null)
                     response = VideoData(
-                        id = video[Video.id],
-                        name = video[Video.name],
-                        viewCount = video[Video.viewCount],
-                        information = video[Video.information],
-                        sequence = video[Video.sequence],
-                        classId = video[Video.classId],
-                        fileName = video[Video.fileName]
+                        id = video[VideoTable.id],
+                        name = video[VideoTable.name],
+                        viewCount = video[VideoTable.viewCount],
+                        information = video[VideoTable.information],
+                        sequence = video[VideoTable.sequence],
+                        classId = video[VideoTable.classId],
+                        fileName = video[VideoTable.fileName]
                     )
-                else throw BadRequestException("")
+                else throw BadRequestException("Fail")
             }
             call.respond(
                 API(
                     data = response,
                     error = response == null,
-                    errorMessage = if (response == null) "" else ""
+                    errorMessage = if (response == null) "Fail" else ""
                 )
             )
         }
     }
-
+    // ok
     put("/class/{classID}/{videoID}") {
         val videoId = call.parameters["videoID"]?.toInt()
         val query = call.request.queryParameters
@@ -66,10 +65,10 @@ fun Route.video() {
         if (videoId != null && (videoName != null || info != null)) {
             var isVideo = false
             transaction {
-                isVideo = Video.select {
-                    Video.id.eq(videoId)
+                isVideo = VideoTable.select {
+                    VideoTable.id.eq(videoId)
                 }.firstOrNull() != null
-                Video.update({ Video.id.eq(videoId) }) {
+                VideoTable.update({ VideoTable.id.eq(videoId) }) {
                     if (videoName != null)
                         it[name] = videoName
                     if (info != null)
@@ -83,11 +82,11 @@ fun Route.video() {
                         "Ok"
                     )
                 )
-            } else throw BadRequestException("")
+            } else throw BadRequestException("Fail")
         } else throw MissingRequestParameterException("name or info")
     }
-
-    post("/class/{classID}") {
+    // ok
+    post("/class/{classID}/upload") {
         val videoData = call.receiveMultipart()
         val receive = call.request.queryParameters
         val videoInfo = receive["info"]
@@ -96,7 +95,7 @@ fun Route.video() {
         val classId = call.parameters["classID"]?.toInt()
         var respondVideoData: VideoData? = null
 
-        if (classId == null) throw BadRequestException("GG")
+        if (classId == null) throw BadRequestException("Fail")
         if (videoInfo == null || videoName == null) throw MissingRequestParameterException("video Info or name")
 
         videoData.forEachPart { part ->
@@ -118,19 +117,19 @@ fun Route.video() {
         else {
 
             transaction {
-                val data = Video.insert {
+                val data = VideoTable.insert {
                     it[name] = videoName
                     it[information] = videoInfo
-                    it[Video.fileName] = fileName
+                    it[VideoTable.fileName] = fileName
                     it[viewCount] = 0
-                    it[Video.classId] = classId
+                    it[VideoTable.classId] = classId
                 }
                 respondVideoData = VideoData(
-                    data[Video.id],
+                    data[VideoTable.id],
                     videoName,
                     videoInfo,
                     0,
-                    data[Video.sequence],
+                    data[VideoTable.sequence],
                     classId,
                     fileName!!
                 )

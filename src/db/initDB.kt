@@ -2,13 +2,10 @@ package com.hack.db
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
-object Student : Table() {
+object StudentTable : Table() {
     val id = integer("StudentId").autoIncrement().primaryKey()
     val name = text("Name")
     val hashcode = text("Hashcode")
@@ -17,7 +14,7 @@ object Student : Table() {
     val teacher = bool("teacher")
 }
 
-object Class : Table() {
+object ClassesTable : Table() {
     val id = integer("ClassId").autoIncrement().primaryKey()
     val name = text("Name")
     val information = text("Information")
@@ -25,7 +22,7 @@ object Class : Table() {
     val img = text("img")
 }
 
-object Video : Table() {
+object VideoTable : Table() {
     val id =  integer("VideoId").autoIncrement().primaryKey()
     val name = text("Name")
     val classId = integer("ClassId")
@@ -42,13 +39,14 @@ fun initDB() {
     Database.connect(dataSource)
 
     transaction {
-        SchemaUtils.create(Student, Class, Video)
-        Student.insert {
+        SchemaUtils.create(StudentTable, ClassesTable, VideoTable)
+        StudentTable.insert {
             it[name] = "22"
             it[hashcode] = "aa"
             it[collect] = 10
             it[collects] = ""
             it[teacher] = false
         }
+
     }
 }
