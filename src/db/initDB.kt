@@ -1,5 +1,6 @@
 package com.hack.db
 
+import at.favre.lib.crypto.bcrypt.BCrypt
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.*
@@ -22,7 +23,7 @@ object ClassesTable : Table() {
 }
 
 object VideoTable : Table() {
-    val id =  integer("VideoId").autoIncrement().primaryKey()
+    val id = integer("VideoId").autoIncrement().primaryKey()
     val name = text("Name")
     val classId = integer("ClassId")
     val fileName = text("FileName")
@@ -39,12 +40,13 @@ fun initDB() {
 
     transaction {
         SchemaUtils.create(StudentTable, ClassesTable, VideoTable)
-        StudentTable.insert {
-            it[name] = "22"
-            it[hashcode] = "aa"
+        StudentTable.select {
+            StudentTable.name.eq("teacher")
+        }.firstOrNull() ?: StudentTable.insert {
+            it[name] = "teacher"
+            it[hashcode] = BCrypt.withDefaults().hashToString(12, "password".toCharArray())
             it[collects] = "[]"
-            it[teacher] = false
+            it[teacher] = true
         }
-
     }
 }
