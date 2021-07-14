@@ -151,5 +151,7 @@ fun Route.classSystem() {
 
         } else throw MissingRequestParameterException("name or info")
     }
+    put("class/{ClassID}/{VideoID}/order") {
 
+    }
 }

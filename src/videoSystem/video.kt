@@ -97,7 +97,6 @@ fun Route.video() {
 
         if (classId == null) throw BadRequestException("Fail")
         if (videoInfo == null || videoName == null) throw MissingRequestParameterException("video Info or name")
-
         videoData.forEachPart { part ->
             when (part) {
                 is PartData.FileItem -> {

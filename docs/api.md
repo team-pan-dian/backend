@@ -123,7 +123,26 @@
 
 
 - 上傳影片到課程 **[POST]** `/api/class/{Class Id}/upload`
-    - `curl -X POST -H "Authorization: Bearer {JWT}" -F upload=@"{PATH}" "http://{Host Name}/api/class/1?name={Video Name}&info={Video info}"`
+    - `curl -X POST -H "Authorization: Bearer {JWT}" -F upload=@"{PATH}" "http://{Host Name}/api/class/1/upload?name={Video Name}&info={Video info}"`
+    - ```json5
+      {
+          "error":false,
+          "data": {
+              "id":3,
+              "name":"asd",
+              "information":"asd",
+              "viewCount":0,
+              "sequence":3,
+              "classId":2,
+              "fileName":"1626254309948YouTube.mp4"
+          },
+          "errorMessage":""
+      }
+        ```
+
+    - error
+        - UnprocessableEntity: 缺少參數
+        - BadRequestException: 沒這個class
 
 - 影片資訊 **[GET]** `/api/class/{Class Id}/{Video Id}`
     - `curl -X GET -H "Authorization: Bearer {JWT}" http://{Host Nmae}/api/class/{Class Id}/{Video id}`
@@ -134,10 +153,10 @@
           "errorMessage": ""
       }
       ```
-  - error
-      - UnprocessableEntity: 缺少參數
-      - BadRequestException: 沒這個video
-    
+    - error
+        - UnprocessableEntity: 缺少參數
+        - BadRequestException: 沒這個video
+
 
 - 更新課程影片資訊 **[PUT]** `/api/class/{Class Id}/{Video Id}`
     - `curl -X PUT -H "Authorization: Bearer {JWT}" http://{Host Name}/api/class/{Class Id}/{Video ID}/?name={revise Name}&info={revise info}`
@@ -151,13 +170,16 @@
     - error
         - UnprocessableEntity: 缺少參數
         - BadRequestException: 沒這個video
-    
+
 
 - 修改課程排序 **[PUT]** `/api/class/{Class Id}/{Video Id}/order`
 
 ## User Start
+
 - 加入收藏 **[POST]** `/api/student/start`
     - `curl -X POST /api/student/start?video={Video Id}`
-    
+    - ```json5
+        
+      ```
 
 [comment]: <> (`應該還有學生加入課程和退出ㄅ 還是這邊都是教師`) // have those thing will be unfree
