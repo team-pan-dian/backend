@@ -27,12 +27,11 @@ object Class : Table() {
 object Video : Table() {
     val id =  integer("VideoId").autoIncrement().primaryKey()
     val name = text("Name")
-    val url = text("URL")
     val classId = integer("ClassId")
-    val collect = bool("Collect")
+    val fileName = text("FileName")
     val information = text("Information")
     val viewCount = integer("ViewCount")
-    val sequence = integer("Sequence")
+    val sequence = integer("Sequence").autoIncrement()
 }
 
 fun initDB() {

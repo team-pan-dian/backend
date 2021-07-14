@@ -7,10 +7,7 @@ import io.ktor.features.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 data class ClassCopy(
@@ -78,8 +75,7 @@ fun Route.classSystem() {
         } else throw MissingRequestParameterException("name or info")
     }
 
-
-    delete("class/{id}") {
+    delete("/class/{id}") {
         val classID = call.parameters["id"]?.toInt() ?: throw BadRequestException("The type of Id is wrong.")
         var classData: ResultRow? = null
         transaction {
@@ -96,5 +92,38 @@ fun Route.classSystem() {
                 "Ok"
             )
         )
+    }
+
+    put("/class/{id}") {
+        val classId = call.parameters["id"]?.toInt()
+        val query = call.request.queryParameters
+        val className = query["name"]
+        val info = query["info"]
+
+        if (classId != null && (className != null || info != null)) {
+            var isClass = false
+            transaction {
+                isClass = Class.select {
+                    Class.id.eq(classId)
+                }.firstOrNull() != null
+                Class.update({ Class.id.eq(classId) }) {
+                    if (className != null)
+                        it[name] = className
+                    if (info != null) {
+                        it[information] = info
+                    }
+                }
+            }
+
+            if (isClass) {
+                call.respond(
+                    API(
+                        false,
+                        "Ok"
+                    )
+                )
+            } else throw BadRequestException("")
+
+        } else throw MissingRequestParameterException("name or info")
     }
 }

@@ -8,10 +8,11 @@ import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
-
+import java.util.*
 
 
 fun Route.video() {
@@ -32,26 +33,27 @@ fun Route.video() {
 
 
 
-    get("/video/{number}") {
-        val videoID = call.request.queryParameters["number"]?.toInt()
-        if (videoID == null) call.respond(mapOf("Fail" to true))
+    get("/class/{classId}/{id}") {
+        val videoID = call.parameters["id"]?.toInt()
+        if (videoID == null) throw MissingRequestParameterException("video id")
         else {
             var response: VideoData? = null
             transaction {
                 val video = Video.select {
                     Video.id.eq(videoID)
-                }.first()
+                }.firstOrNull()
 
-                response = VideoData(
-                    id = video[Video.id],
-                    name = video[Video.name],
-                    token = video[Video.url],
-                    collect = video[Video.collect],
-                    viewCount = video[Video.viewCount],
-                    information = video[Video.information],
-                    sequence = video[Video.sequence],
-                    classId = video[Video.classId]
-                )
+                if (video != null)
+                    response = VideoData(
+                        id = video[Video.id],
+                        name = video[Video.name],
+                        viewCount = video[Video.viewCount],
+                        information = video[Video.information],
+                        sequence = video[Video.sequence],
+                        classId = video[Video.classId],
+                        fileName = video[Video.fileName]
+                    )
+                else throw BadRequestException("")
             }
             call.respond(
                 API(
@@ -63,24 +65,46 @@ fun Route.video() {
         }
     }
 
-    post("/video") {
+    post("/class/{classID}") {
         val videoData = call.receiveMultipart()
-        var fileName: String
+        val receive = call.receiveParameters()
+        val videoInfo = receive["info"]
+        val videoName = receive["name"]
+        val filesName = mutableListOf<String>()
+        val classId = call.parameters["classID"]?.toInt()
+        var respondVideoData: VideoData? = null
 
+        if (videoInfo == null || videoName == null) throw MissingRequestParameterException("video Info")
         videoData.forEachPart { part ->
             when (part) {
                 is PartData.FileItem -> {
-                    fileName = part.originalFileName as String
+                    val fileName = Date().time.toString() + part.originalFileName as String
+                    filesName.add(fileName)
                     val fileNameExtension = fileName.split(".")
                     if (fileNameExtension[fileNameExtension.size - 1] != "mp4") {
-                        call.respond(mapOf("Fail" to true))
+                        throw BadRequestException("Fail")
                     } else {
-                        fileName = part.originalFileName as String
                         val fileBytes = part.streamProvider().readBytes()
                         File("video/$fileName").writeBytes(fileBytes)
                     }
-                    call.respond(mapOf("OK" to true))
                 }
+            }
+        }
+        if (filesName.size == 0) throw MissingRequestParameterException("file")
+        else {
+            filesName.map { videoFileName ->
+
+                transaction {
+                    val a = Video.insert {
+                        it[name] = videoName
+                        it[information] = videoInfo
+                        it[fileName] = videoFileName
+                        it[viewCount] = 0
+                        it[Video.classId] = classId
+                    }
+                    a[Video.id]
+                }
+
             }
         }
     }

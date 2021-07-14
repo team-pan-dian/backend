@@ -45,7 +45,8 @@
                 "name": "a", // 課程名稱
                 "count": 0, // 課程數量
                 "information": "w", //課程說明
-                "videoList": [] // 課程影片id清單
+                "videoList": [], // 課程影片id清單,
+                "img": "" // 課程封面
             },
             "errorMessage": ""
         }
@@ -64,26 +65,45 @@
     - error
         - UnprocessableEntity: 缺少參數
     
-
     
 - 刪除課程 **[DELETE]** `/api/class/{Class Id}`
     - `curl -X DELETE http://{Host Name}/api/class/{Class Id}`
     - ```json
       {
-      "error": false,
-      "data": "ok",
-      "errorMessage": ""
+          "error": false,
+          "data": "ok",
+          "errorMessage": ""
       }
       ```
     - error
         - UnprocessableEntity: 缺少參數
         - BadRequestException: 沒這個class
 
-- 修改課程 **[PUT]** `/api/class/{Class Id}`
+- 修改課程資訊 **[PUT]** `/api/class/{Class Id}`
+    - `curl -X PUT http://{Host Name}/api/class/{Class Id}/?name={revise Name}&info={revise info}`
+    - ```json5
+      {
+          "error": false,
+          "data": "ok",
+          "errorMessage": ""
+      }
+      ```
+  - error
+      - UnprocessableEntity: 缺少參數
+      - BadRequestException: 沒這個class
+    
 
-- 上傳影片到課程 **[POST]** `/api/class/{Class Id}/`
+- 上傳影片到課程 **[POST]** `/api/class/{Class Id}`
 
 - 課程影片資訊 **[GET]** `/api/class/{Class Id}/{Video Id}`
+    - `curl -X GET http://{Host Nmae}/api/class/{Class Id}/{Video id}`
+  - ```json5
+      {
+          "error": false,
+          "data": "ok",
+          "errorMessage": ""
+      }
+      ```
 
 - 更新課程影片資訊 **[PUT]** `/api/class/{Class Id}/{Video Id}`
 
