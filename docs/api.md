@@ -9,11 +9,17 @@
 
 - 登入 **[POST]** `/api/login`
     - `curl -X POST -F name={User Name} -F password={User Password} http://{Host Name}/api/login`
-    - ```json
+    - ```json5
         {
-          "error": false,
-          "data": "JWT",
-          "errorMessage": ""
+          "error":false,
+          "data":
+            {
+              "token":"JWT", // JWT
+              "teacher":false, // 484老師
+              "collects":"[]", // 收藏影片id
+              "name":"a" // 用戶名稱
+            },
+          "errorMessage":""
         }
       ```
     - error
@@ -42,7 +48,13 @@
         {
           "error":false,
           "data":[
-            {"id":"1","name":"a","information":"w","img":"","type":"s"}
+            {
+              "id":"1", 
+              "name":"a",
+              "information":"w", //說明
+              "img":"", // 圖片
+              "type":"s" // 課程類別
+            }
           ],
           "errorMessage":""
         }

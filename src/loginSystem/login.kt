@@ -14,6 +14,13 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
+data class UserData(
+    val token: String,
+    val teacher: Boolean,
+    val collects: String,
+    val name: String
+)
+
 fun Route.login() {
 
     post("/login") {
@@ -42,12 +49,18 @@ fun Route.login() {
                 call.respond(
                     API(
                         false,
-                        JWTConfig.makeToken(
-                            User(
-                                loginData!![StudentTable.id],
-                                loginData!![StudentTable.teacher]
-                            )
+                        UserData(
+                            JWTConfig.makeToken(
+                                User(
+                                    loginData!![StudentTable.id],
+                                    loginData!![StudentTable.teacher]
+                                )
+                            ),
+                            loginData!![StudentTable.teacher],
+                            loginData!![StudentTable.collects],
+                            loginData!![StudentTable.name]
                         )
+
                     )
                 )
             } else call.respond(
@@ -80,7 +93,6 @@ fun Route.login() {
                     StudentTable.insert {
                         it[name] = userName
                         it[hashcode] = BCrypt.withDefaults().hashToString(12, userPassword.toCharArray())
-                        it[collect] = 0
                         it[collects] = "[]"
                         it[teacher] = false
                     }

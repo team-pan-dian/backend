@@ -9,7 +9,6 @@ object StudentTable : Table() {
     val id = integer("StudentId").autoIncrement().primaryKey()
     val name = text("Name")
     val hashcode = text("Hashcode")
-    val collect = integer("Collect")
     val collects = text("Collects") // json
     val teacher = bool("teacher")
 }
@@ -43,8 +42,7 @@ fun initDB() {
         StudentTable.insert {
             it[name] = "22"
             it[hashcode] = "aa"
-            it[collect] = 10
-            it[collects] = ""
+            it[collects] = "[]"
             it[teacher] = false
         }
 
