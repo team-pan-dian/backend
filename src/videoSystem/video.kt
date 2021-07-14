@@ -33,8 +33,7 @@ fun Route.video() {
                 val video = VideoTable.select {
                     VideoTable.id.eq(videoID)
                 }.firstOrNull()
-
-                if (video != null)
+                if (video != null) {
                     response = VideoData(
                         id = video[VideoTable.id],
                         name = video[VideoTable.name],
@@ -44,6 +43,8 @@ fun Route.video() {
                         classId = video[VideoTable.classId],
                         fileName = video[VideoTable.fileName]
                     )
+
+                }
                 else throw BadRequestException("Fail")
             }
             call.respond(

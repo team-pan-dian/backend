@@ -174,10 +174,25 @@
 
 - 修改課程排序 **[PUT]** `/api/class/{Class Id}/{Video Id}/order`
 
-## User Start
+## User Star
 
-- 加入收藏 **[POST]** `/api/student/start`
-    - `curl -X POST /api/student/start?video={Video Id}`
+- 是否已收藏 **[GET]** `/api/stident/star`
+    - `curl -X POST /api/student/star?video={Video Id}`
+  - ```json5
+      {
+        "error":false,
+        "data":{
+          "favorite":true
+        },
+        "errorMessage":""
+      }
+      ```
+  - error
+      - UnprocessableEntity: 缺少參數
+      - BadRequestException: 沒這個video
+
+- 加入收藏 **[POST]** `/api/student/star`
+    - `curl -X POST /api/student/star?video={Video Id}`
     - ```json5
       {
           "error": false,
@@ -189,8 +204,8 @@
       - UnprocessableEntity: 缺少參數
       - BadRequestException: 沒這個video
 
-- 刪除收藏 **[DELETE]** `/api/student/start`
-    - `curl -X DELETE /api/student/start?video={Video Id}`
+- 刪除收藏 **[DELETE]** `/api/student/star`
+    - `curl -X DELETE /api/student/star?video={Video Id}`
     - ```json5
       {
           "error": false,

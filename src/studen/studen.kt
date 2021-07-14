@@ -3,6 +3,8 @@ package com.hack.studen
 import com.google.gson.Gson
 import com.hack.api.API
 import com.hack.db.StudentTable
+import com.hack.db.StudentTable.collects
+import com.hack.db.StudentTable.id
 import com.hack.user
 import io.ktor.application.*
 import io.ktor.features.*
@@ -16,12 +18,31 @@ import org.jetbrains.exposed.sql.update
 fun Route.student() {
     val gson = Gson()
 
-    post("/student/start") {
+    get("/student/star") {
+        val videoId = call.request.queryParameters["video"] ?: throw MissingRequestParameterException("video id")
+        val userId = call.user?.id ?: throw BadRequestException("")
+        var isVideoFavorite = false
+        transaction {
+            val data = gson.fromJson(StudentTable.select {
+                id.eq(userId)
+            }.first()[collects], Array<String>::class.java).toMutableList()
+            isVideoFavorite = data.contains(videoId)
+        }
+        call.respond(
+            API(
+                false,
+                mapOf("favorite" to isVideoFavorite)
+            )
+        )
+
+    }
+
+    post("/student/star") {
         val videoId = call.request.queryParameters["video"] ?: throw MissingRequestParameterException("video")
         val userId = call.user?.id ?: throw BadRequestException("")
 
         transaction {
-            StudentTable.update({ StudentTable.id.eq(userId) }) {
+            StudentTable.update({ id.eq(userId) }) {
                 val data = gson.fromJson(StudentTable.select {
                     id.eq(userId)
                 }.first()[collects], Array<String>::class.java).toMutableList()
@@ -39,11 +60,11 @@ fun Route.student() {
         )
     }
 
-    delete("/student/start") {
+    delete("/student/star") {
         val videoId = call.request.queryParameters["video"] ?: throw MissingRequestParameterException("video")
         val userId = call.user?.id ?: throw BadRequestException("")
         transaction {
-            StudentTable.update({ StudentTable.id.eq(userId) }) {
+            StudentTable.update({ id.eq(userId) }) {
                 val data = gson.fromJson(StudentTable.select {
                     id.eq(userId)
                 }.first()[collects], Array<String>::class.java).toMutableList()
