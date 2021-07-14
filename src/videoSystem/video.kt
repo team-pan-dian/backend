@@ -10,7 +10,9 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.io.File
 import java.util.*
 
@@ -22,13 +24,6 @@ fun Route.video() {
         val information: String,
     )
 
-    put("/class/{classnum}") {
-        val requestId = call.parameters["classnum"]?.toInt() ?: throw BadRequestException("The type of Id is wrong.")
-
-        transaction {
-
-        }
-    }
 
     get("/class/{classId}/{id}") {
         val videoID = call.parameters["id"]?.toInt()
@@ -62,9 +57,39 @@ fun Route.video() {
         }
     }
 
+    put("/class/{classID}/{videoID}") {
+        val videoId = call.parameters["videoID"]?.toInt()
+        val query = call.request.queryParameters
+        val videoName = query["name"]
+        val info = query["info"]
+
+        if (videoId != null && (videoName != null || info != null)) {
+            var isVideo = false
+            transaction {
+                isVideo = Video.select {
+                    Video.id.eq(videoId)
+                }.firstOrNull() != null
+                Video.update({ Video.id.eq(videoId) }) {
+                    if (videoName != null)
+                        it[name] = videoName
+                    if (info != null)
+                        it[information] = info
+                }
+            }
+            if (isVideo) {
+                call.respond(
+                    API(
+                        false,
+                        "Ok"
+                    )
+                )
+            } else throw BadRequestException("")
+        } else throw MissingRequestParameterException("name or info")
+    }
+
     post("/class/{classID}") {
         val videoData = call.receiveMultipart()
-        val receive = call.receiveParameters()
+        val receive = call.request.queryParameters
         val videoInfo = receive["info"]
         val videoName = receive["name"]
         var fileName: String? = null
@@ -80,10 +105,11 @@ fun Route.video() {
                     fileName = Date().time.toString() + part.originalFileName as String
                     val fileNameExtension = fileName!!.split(".")
                     if (fileNameExtension[fileNameExtension.size - 1] != "mp4") {
+                        println(fileNameExtension)
                         throw BadRequestException("Fail")
                     } else {
                         val fileBytes = part.streamProvider().readBytes()
-                        File("video/$fileName").writeBytes(fileBytes)
+                        File("H:\\動態桌布\\$fileName").writeBytes(fileBytes)
                     }
                 }
             }

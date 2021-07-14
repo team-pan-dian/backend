@@ -21,6 +21,7 @@ object Class : Table() {
     val id = integer("ClassId").autoIncrement().primaryKey()
     val name = text("Name")
     val information = text("Information")
+    val type = text("Type")
     val img = text("img")
 }
 

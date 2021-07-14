@@ -104,7 +104,6 @@ fun Application.module(testing: Boolean = false) {
             HttpStatusCode.ServiceUnavailable,
             HttpStatusCode.BadRequest,
             HttpStatusCode.UnprocessableEntity,
-            HttpStatusCode.InternalServerError
         ) {
             call.respond(
                 it,

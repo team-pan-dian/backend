@@ -13,13 +13,35 @@ import org.jetbrains.exposed.sql.transactions.transaction
 data class ClassCopy(
     val id: String,
     val name: String,
-    val count: Int,
+    val count: Int? = null,
     val information: String,
-    val videoList: List<VideoData>,
-    val img: String
+    val videoList: List<VideoData>? = null,
+    val img: String,
+    val type: String
 )
 
 fun Route.classSystem() {
+
+    get("/classes") {
+        var data: List<ClassCopy>? = null
+        transaction {
+            data = Class.selectAll().map {
+                ClassCopy(
+                    id = it[Class.id].toString(),
+                    name = it[Class.name],
+                    information = it[Class.information],
+                    img =  it[Class.img],
+                    type = it[Class.type]
+                )
+            }
+        }
+        if (data != null) call.respond(
+            API(
+                false,
+                data
+            )
+        ) else throw BadRequestException("Fail")
+    }
 
     get("/class/{id}") {
         val classID = call.parameters["id"]?.toInt()
@@ -39,7 +61,8 @@ fun Route.classSystem() {
                         count = videoList.size,
                         information = request[Class.information],
                         videoList = videoList,
-                        img =  request[Class.img]
+                        img =  request[Class.img],
+                        type = request[Class.type]
                     )
                 } else null
             }
@@ -57,13 +80,15 @@ fun Route.classSystem() {
         val receive = call.receiveParameters()
         val className = receive["name"]
         val classInformation = receive["info"]
+        val classType = receive["type"]
 
-        if (classInformation != null && className != null) {
+        if (classInformation != null && className != null && classType != null) {
             transaction {
                 Class.insert {
                     it[name] = className
                     it[information] = classInformation
                     it[img] = ""
+                    it[type] = classType
                 }
             }
             call.respond(
@@ -72,7 +97,7 @@ fun Route.classSystem() {
                     "Ok"
                 )
             )
-        } else throw MissingRequestParameterException("name or info")
+        } else throw MissingRequestParameterException("name or info or type")
     }
 
     delete("/class/{id}") {
@@ -126,4 +151,5 @@ fun Route.classSystem() {
 
         } else throw MissingRequestParameterException("name or info")
     }
+
 }
