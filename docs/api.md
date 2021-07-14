@@ -143,4 +143,9 @@
 
 - 修改課程排序 **[PUT]** `/api/class/{Class Id}/{Video Id}/order`
 
-[comment]: <> (`應該還有學生加入課程和退出ㄅ 還是這邊都是教師端`) // have those thing will be unfree
+## User Start
+- 加入收藏 **[POST]** `/api/student/start`
+    - `curl -X POST /api/student/start?video={Video Id}`
+    
+
+[comment]: <> (`應該還有學生加入課程和退出ㄅ 還是這邊都是教師`) // have those thing will be unfree

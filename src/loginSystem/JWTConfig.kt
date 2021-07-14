@@ -3,9 +3,10 @@ package com.hack.loginSystem
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import io.ktor.auth.*
 import java.util.*
 
-data class User(val id: Int, val name: String)
+data class User(val id: Int, val isTeacher: Boolean) : Principal
 
 object JWTConfig {
     private const val secret = "zAP5MBA4B4Ijz0MZaS48"
@@ -24,6 +25,7 @@ object JWTConfig {
             .withSubject("Authentication")
             .withIssuer(issuer)
             .withClaim("id", user.id)
+            .withClaim("isTeacher", user.isTeacher)
             .withExpiresAt(getExpiration())
             .sign(algorithm)
     }

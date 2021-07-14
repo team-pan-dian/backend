@@ -43,7 +43,10 @@ fun Route.login() {
                     API(
                         false,
                         JWTConfig.makeToken(
-                            User(loginData!![StudentTable.id], loginData!![StudentTable.name])
+                            User(
+                                loginData!![StudentTable.id],
+                                loginData!![StudentTable.teacher]
+                            )
                         )
                     )
                 )
