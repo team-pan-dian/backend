@@ -7,7 +7,7 @@ services:
     environment:
       - POSTGRESQL_USERNAME=postgres
       - POSTGRESQL_PASSWORD=4818115
-      - POSTGRESQL_DATABASE=hack
+      - POSTGRESQL_DATABASE=hack2
     ports:
       - "5432:5432"
     volumes:
