@@ -64,10 +64,8 @@ fun Application.module(testing: Boolean = false) {
 
     install(StatusPages) {
         // 404
-//        statusFile(HttpStatusCode.NotFound, HttpStatusCode.Unauthorized, filePattern = "404.html")
-        status(HttpStatusCode.NotFound) {
-            call.respond("a")
-        }
+        statusFile(HttpStatusCode.NotFound, HttpStatusCode.Unauthorized, filePattern = "404.html")
+
         exception<MissingRequestParameterException> {
 
             call.respond(

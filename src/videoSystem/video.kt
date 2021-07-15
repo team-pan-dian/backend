@@ -30,12 +30,12 @@ fun Route.video() {
                 }.firstOrNull()
                 if (video != null) {
                     response = VideoData(
-                        id = video[VideoTable.id],
+                        id = video[VideoTable.id].toString(),
                         name = video[VideoTable.name],
                         viewCount = video[VideoTable.viewCount],
                         information = video[VideoTable.information],
                         sequence = video[VideoTable.sequence],
-                        classId = video[VideoTable.classId],
+                        classId = video[VideoTable.classId].toString(),
                         fileName = video[VideoTable.fileName]
                     )
 
@@ -105,7 +105,7 @@ fun Route.video() {
                             throw BadRequestException("Fail")
                         } else {
                             val fileBytes = part.streamProvider().readBytes()
-                            File("H:\\動態桌布\\$fileName").writeBytes(fileBytes)
+                            File("./videos/$fileName").writeBytes(fileBytes)
                         }
                     }
                 }
@@ -122,12 +122,12 @@ fun Route.video() {
                         it[VideoTable.classId] = classId
                     }
                     respondVideoData = VideoData(
-                        data[VideoTable.id],
+                        data[VideoTable.id].toString(),
                         videoName,
                         videoInfo,
                         0,
                         data[VideoTable.sequence],
-                        classId,
+                        classId.toString(),
                         fileName!!
                     )
                 }

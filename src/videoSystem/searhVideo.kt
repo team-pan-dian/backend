@@ -13,12 +13,12 @@ fun searchVideo(classId: Int): List<VideoData> {
         }
     }.map {
         VideoData(
-            it[VideoTable.id],
+            it[VideoTable.id].toString(),
             it[VideoTable.name],
             it[VideoTable.information],
             it[VideoTable.viewCount],
             it[VideoTable.sequence],
-            it[VideoTable.classId],
+            it[VideoTable.classId].toString(),
             it[VideoTable.fileName]
         )
     }

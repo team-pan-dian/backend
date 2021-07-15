@@ -36,7 +36,7 @@ fun Route.classSystem() {
                 )
             }
         }
-        println(data)
+
         if (data != null) call.respond(
             API(
                 false,
